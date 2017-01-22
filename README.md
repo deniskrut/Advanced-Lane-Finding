@@ -1,7 +1,5 @@
 ## Advanced Lane Finding Project
 
----
-
 The goals / steps of this project are the following:
 
 * Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
@@ -19,8 +17,8 @@ The goals / steps of this project are the following:
 [image2]: ./images/undistort.png "Road Transformed"
 [image3]: ./images/binary.png "Binary Example"
 [image4]: ./images/warped_straight_lines.png "Warp Example"
-[image5]: ./images/fit_lines.jpg "Fit Visual"
-[image6]: ./images/example_output.jpg "Output"
+[image5]: ./images/fit_lines.png "Fit Visual"
+[image6]: ./images/example_output.png "Output"
 [video1]: ./project_video_solution.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points

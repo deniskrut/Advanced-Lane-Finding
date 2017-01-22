@@ -45,12 +45,12 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 ###Pipeline (single images)
 
 ####1. Provide an example of a distortion-corrected image.
-Using undistortion matrix obtained at the calibration step, I use `cv2.undistort` function to undo the distortion. You can see result below:
+Using undistortion matrix obtained at the calibration step, I execute `cv2.undistort` function to undo the distortion. You can see result below:
 
 ![alt text][image2]
 
 ####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-I’ve observed that detection works better on S channel of HLS on some set of images, while on others L works better. So I used OR combination to get both. I also noticed that some false positives can be masked by threshold on the S or L channel of HLS.
+I’ve observed that detection works better on S channel of HLS on some set of images, while on others L works better. So I used OR combination to get both. I also noticed that some false positives can be masked by threshold on the S and L channel of HLS, so I applied that step as well.
 
 The code for this step is contained in the second code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`.
 
@@ -60,11 +60,9 @@ Here is what result looks like:
 
 ####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for this step is contained in the third code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`. Function `change_prespective` takes `image` as a parameter, and optional `reverse` flag that allows reverse transofrmation.
+The code for this step is contained in the third code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`. Function `change_perspective` takes `image` as a parameter, and optional `reverse` flag that allows reverse transofrmation.
 
-Some of the sample images have been of varying resolutions, so I have chosen source and destination points relative to the image.
-
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+Some of the sample images have been of varying resolutions, so I have chosen source and destination points relative to the image. Here is how source and destination points are defined:
 
 ```
 src = np.float32([
@@ -101,11 +99,11 @@ The code for this step is contained in the fourth code cell of the IPython noteb
 
 If I don’t have prior assumptions about where the lanes are, I do a full search (`get_lane_points_bottom_up` function). First I take bottom quarter of the image and get a histogram and peaks on that histogram (`sorted_peaks` function). Form that peaks I form a pairs of peaks that are likely represent lanes - based on distance between the peaks (`get_lanes_candidates` function). I sort those pairs in a way that lanes containing highest peaks go first. Let’s call those pairs a candidates for lanes.
 
-I iterate through candidates looking for ones that will yield lanes for me. I cut image to 8 pieces horizontally, and for each horizontal piece starting from the bottom I try to find pixels that are close to the candidate point (`get_points_around_x` function). Coming to the next piece I update my candidate point to be mean of all lane points from the previous piece. If there are no white pixels at given location, I ignore it.
+I iterate through candidates looking for ones that will yield lanes for me. I cut image to 8 pieces horizontally, and for each horizontal piece starting from the bottom I try to find pixels that are close to the candidate point (`get_points_around_x` function). Coming to the next piece I update my candidate point to be mean of all lane points for each lane from the previous piece. If there are no white pixels at given location, I ignore it.
 
-The process above stops when I find good enough points. I have certain thresholds for what I believe good enough lanes are in terms of bend, slope, how close to a parallel they are and how much residual did I get from the polynomial fit (`is_good_points` function). At that time I declare those points to belong to a lane and return. Otherwise, I return the best result I have been able to obtain. To define which lanes are better, I wrote a scoring function (`score_lanes`). That function favors lanes that are parallel, have about the same bend, slope, greater number of points and lower residual from the polynomial fit for the points obtained from that group.
+The process above stops when I find good enough lane points. I have certain thresholds for what I believe good enough lanes are in terms of bend, slope, how close to a parallel they are and how much residual did I get from the polynomial fit (`is_good_points` function). If I cannot find good points, I return the best result I have been able to obtain. To define which lanes are better, I wrote a scoring function (`score_lanes`). That function favors lanes that are parallel, have about the same bend, slope, greater number of points and lower residual from the polynomial fit for the points associated with each lane.
 
-If I have information about lane points found in the prior frame, I try to search for lanes near where they used to be (`get_lane_points_nearby` function). For that I divide image into 8 horizontal pieces, obtain middle point from previous polynomial fit for each piece (`get_x_for_line` function), and search for non-zero pixels in the vicinity of that middle point (`get_points_around_x` function).
+If I have information about lane points found in the prior frame, I try to search for lanes near where they used to be (`get_lane_points_nearby` function). For that I divide image into 8 horizontal pieces, obtain lane location from previous polynomial fit for each piece (`get_x_for_line` function), and search for non-zero pixels in the vicinity of that location (`get_points_around_x` function).
 
 Image below demonstrates polynomial fit for lane points. Left lane is in red, right lane is in blue. Polinomial fit lines are in green.
 

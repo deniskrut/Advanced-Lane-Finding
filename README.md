@@ -45,7 +45,7 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 ###Pipeline (single images)
 
 ####1. Provide an example of a distortion-corrected image.
-Using undistortion matrix obtained at the calibration step, I use `cv2.undistort` function to undo the distortion. You can see tresult below:
+Using undistortion matrix obtained at the calibration step, I use `cv2.undistort` function to undo the distortion. You can see result below:
 
 ![alt text][image2]
 
@@ -62,7 +62,7 @@ Here is what result looks like:
 
 The code for this step is contained in the third code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`. Function `change_prespective` takes `image` as a parameter, and optional `reverse` flag that allows reverse transofrmation.
 
-Some of the sample images have been of varying resolutions, so I have chosen source and destination points relative to the image:
+Some of the sample images have been of varying resolutions, so I have chosen source and destination points relative to the image.
 
 The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
@@ -99,7 +99,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 The code for this step is contained in the fourth code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`.
 
-If I don’t have prior assumptions about where the lanes are, I do a full search (`get_lane_points_bottom_up` function). First I take bottom quater of the image and get a histogram and peaks on that histogram (`sorted_peaks` function). Form that peaks I form a pairs of peaks that are likely represent lanes - based on distance between the peaks (`get_lanes_candidates` function). I sort those pairs in a way that lanes containing highest peaks go first. Let’s call those pairs a candidates for lanes.
+If I don’t have prior assumptions about where the lanes are, I do a full search (`get_lane_points_bottom_up` function). First I take bottom quarter of the image and get a histogram and peaks on that histogram (`sorted_peaks` function). Form that peaks I form a pairs of peaks that are likely represent lanes - based on distance between the peaks (`get_lanes_candidates` function). I sort those pairs in a way that lanes containing highest peaks go first. Let’s call those pairs a candidates for lanes.
 
 I iterate through candidates looking for ones that will yield lanes for me. I cut image to 8 pieces horizontally, and for each horizontal piece starting from the bottom I try to find pixels that are close to the candidate point (`get_points_around_x` function). Coming to the next piece I update my candidate point to be mean of all lane points from the previous piece. If there are no white pixels at given location, I ignore it.
 
@@ -115,7 +115,7 @@ Image below demonstrates polynomial fit for lane points. Left lane is in red, ri
 
 The code for this step is contained in the fourth code cell of the IPython notebook located in `./advanced-lane-finder.ipynb`. Function is called `get_curvature_and_distance_from_center`. It accepts left and right lane coordinates, image width and image height, and returns the curvature and offset from center in meters.
 
-First step is to obtain polynomial for the lane lines in meters, not in pixels. For that, knowing the US government requirements for lane width and dashed line distance, I estimated the conversion coefficients and performed a fit. Secpmd step is to find the line in between of two lane lines. This is done through evaluating polynomial fits for each lane at every vertical position, and finding the center. Third step is to find polynomial fit for the center line. Finally, I obtain a first degree derivative from the polynomial fit of the center line and that constitutes the curvature.
+First step is to obtain polynomial for the lane lines in meters, not in pixels. For that, knowing the US government requirements for lane width and dashed line distance, I estimated the conversion coefficients and performed a fit. Second step is to find the line in between of two lane lines. This is done through evaluating polynomial fits for each lane at every vertical position, and finding the center. Third step is to find polynomial fit for the center line. Finally, I obtain a first degree derivative from the polynomial fit of the center line and that constitutes the curvature.
 
 To obtain center offset I evaluate X position of left and right lane polynomials, and find point in the middle (in meters). Then I find the distance from the center of the image (in meters) tot hat middle of the lane position. That distance is the center offset.
 
@@ -135,7 +135,7 @@ Here is an example of my result on a test image:
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-In order to get video to work, I have declared a global variables to pass results from previous frame to the next frame. If 5 frames in a row did not fit the criteria for good lanes - e.g. parallel, low residual, etc. - I start search from scratch as described above. Otherwise I perform a informed search. See `write_clip` function.
+In order to get video to work, I have declared a global variables to pass results from previous frame to the next frame. If 5 frames in a row did not fit the criteria for good lanes - e.g. parallel, low residual, etc. - I start search from scratch as described above. Otherwise I perform an informed search. See `write_clip` function.
 
 Here's a [link to my video result](./project_video_solution.mp4)
 
@@ -147,9 +147,9 @@ Here's a [link to my video result](./project_video_solution.mp4)
 
 Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
 
-Before trying the current approach, I've tried more complete searches that would not rely that we get a correct peak for the lanes in the bottom quater of an image. For that initially I took all possible candidates for each 1/8th of an image, and iterated through all of them, with higher peaks first. That obviously took tremendous amount of time, and also did not work very well, because lanes might be matched with some artifacts on the image that would give lanes better score.
+Before trying the current approach, I've tried more complete searches that would not rely that we get a correct peak for the lanes in the bottom quarter of an image. For that initially I took all possible candidates for each 1/8th of an image, and iterated through all of them, with higher peaks first. That obviously took tremendous amount of time, and also did not work very well, because lanes might be matched with some artifacts on the image that would give lanes better score.
 
-Other approach I've tried was successive refinement of set of candidates. Starting with some set of candidates for lanes for each of the 1/8th of an image, I would peak other candidate that would improve the score. I did it until lanes were "good", or until score for lanes stops improving. This did have better performance then previous approach, but still saffered from peaking random artifacts and declaring them lanes.
+Other approach I've tried was successive refinement of set of candidates. Starting with some set of candidates for lanes for each of the 1/8th of an image, I would peak other candidate that would improve the score. I did it until lanes were "good", or until score for lanes stops improving. This did have better performance than previous approach, but still suffered from peaking random artifacts and declaring them lanes.
 
 If I had more time, I would implement a better binary image processing. I think better results can be achieved by trying more color models and channels. This would give me better results on challenge videos, that can fail due to false positives in the binary image
 

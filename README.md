@@ -115,7 +115,7 @@ The code for this step is contained in the fourth code cell of the IPython noteb
 
 First step is to obtain polynomial for the lane lines in meters, not in pixels. For that, knowing the US government requirements for lane width and dashed line distance, I estimated the conversion coefficients and performed a fit. Second step is to find the line in between of two lane lines. This is done through evaluating polynomial fits for each lane at every vertical position, and finding the center. Third step is to find polynomial fit for the center line. Finally, I use first and second derivative to obtain a curvature.
 
-To obtain center offset I evaluate X position of left and right lane polynomials, and find point in the middle (in meters). Then I find the distance from the center of the image (in meters) tot hat middle of the lane position. That distance is the center offset.
+To obtain center offset I evaluate X position of left and right lane polynomials, and find point in the middle (in meters). Then I find the distance from the center of the image (in meters) to that middle of the lane position. That distance is the center offset.
 
 ####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
@@ -133,7 +133,7 @@ Here is an example of my result on a test image:
 
 ####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-In order to get video to work, I have declared a global variables to pass results from previous frame to the next frame. If 5 frames in a row did not fit the criteria for good lanes - e.g. parallel, low residual, etc. - I start search from scratch as described above. Otherwise I perform an informed search. See `write_clip` function.
+In order to get video to work, I have declared a global variables to pass results from previous frame to the next frame. If 10 frames in a row did not fit the criteria for good lanes - e.g. parallel, low residual, etc. - I start search from scratch as described above. Otherwise I perform an informed search. See `write_clip` function.
 
 Here's a [link to my video result](./project_video_solution.mp4)
 
@@ -142,8 +142,6 @@ Here's a [link to my video result](./project_video_solution.mp4)
 ###Discussion
 
 ####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
 
 Before trying the current approach, I've tried more complete searches that would not rely that we get a correct peak for the lanes in the bottom quarter of an image. For that initially I took all possible candidates for each 1/8th of an image, and iterated through all of them, with higher peaks first. That obviously took tremendous amount of time, and also did not work very well, because lanes might be matched with some artifacts on the image that would give lanes better score.
 
